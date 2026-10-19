@@ -1,0 +1,31 @@
+name: C++ / CUDA Native CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install C++ Build Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake ninja-build
+
+      - name: Configure CMake (CPU Test Mode)
+        run: |
+          cmake -B build -DENABLE_CUDA=OFF -DBUILD_TESTS=ON -DBUILD_BENCHMARKS=ON
+
+      - name: Build Project
+        run: |
+          cmake --build build -j$(nproc)
+
+      - name: Run Test Suite
+        run: |
+          ctest --test-dir build --output-on-failure

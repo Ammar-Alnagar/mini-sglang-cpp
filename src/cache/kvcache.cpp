@@ -1,14 +1,17 @@
 #include "minisgl/cache/kvcache.h"
 #include <algorithm>
-#include <stdexcept>
 #include <iostream>
+#include <stdexcept>
 
 namespace minisgl {
 
-KVCachePool::KVCachePool(int num_pages, int page_size, int num_heads, int head_dim, DeviceType device)
+KVCachePool::KVCachePool(int num_pages, int page_size, int num_heads, int head_dim,
+                         DeviceType device)
     : num_pages_(num_pages), page_size_(page_size), num_heads_(num_heads), head_dim_(head_dim) {
-    k_cache = Tensor::create({num_pages * page_size, num_heads * head_dim}, DataType::Float32, device);
-    v_cache = Tensor::create({num_pages * page_size, num_heads * head_dim}, DataType::Float32, device);
+    k_cache =
+        Tensor::create({num_pages * page_size, num_heads * head_dim}, DataType::Float32, device);
+    v_cache =
+        Tensor::create({num_pages * page_size, num_heads * head_dim}, DataType::Float32, device);
 
     for (int i = 0; i < num_pages; ++i) {
         free_pages_.push_back(i);
@@ -42,7 +45,8 @@ RadixCache::MatchResult RadixCache::match_prefix(const std::vector<int32_t>& inp
     while (token_offset < input_tokens.size()) {
         int32_t next_tok = input_tokens[token_offset];
         auto it = current->children.find(next_tok);
-        if (it == current->children.end()) break;
+        if (it == current->children.end())
+            break;
 
         auto child = it->second;
         child->timestamp = ++current_time_;
@@ -72,8 +76,10 @@ RadixCache::MatchResult RadixCache::match_prefix(const std::vector<int32_t>& inp
     return result;
 }
 
-void RadixCache::insert_prefix(const std::vector<int32_t>& input_tokens, const std::vector<int>& page_indices) {
-    if (input_tokens.empty()) return;
+void RadixCache::insert_prefix(const std::vector<int32_t>& input_tokens,
+                               const std::vector<int>& page_indices) {
+    if (input_tokens.empty())
+        return;
 
     auto node = std::make_shared<RadixNode>();
     node->id = node_counter_++;
@@ -93,13 +99,13 @@ void RadixCache::evict(int needed_pages) {
         }
     }
 
-    std::sort(leaves.begin(), leaves.end(), [](const auto& a, const auto& b) {
-        return a->timestamp < b->timestamp;
-    });
+    std::sort(leaves.begin(), leaves.end(),
+              [](const auto& a, const auto& b) { return a->timestamp < b->timestamp; });
 
     int freed = 0;
     for (auto& leaf : leaves) {
-        if (freed >= needed_pages) break;
+        if (freed >= needed_pages)
+            break;
         for (int p : leaf->value_pages) {
             pool_->free_page(p);
             freed++;

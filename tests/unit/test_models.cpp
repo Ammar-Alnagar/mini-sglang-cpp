@@ -1,9 +1,9 @@
+#include "minisgl/core/tensor.h"
 #include "minisgl/model/config.h"
 #include "minisgl/model/qwen3.h"
 #include "minisgl/model/qwen3_moe.h"
-#include "minisgl/core/tensor.h"
-#include <iostream>
 #include <cassert>
+#include <iostream>
 
 void test_qwen3_forward() {
     std::cout << "Testing Qwen3 model forward..." << std::endl;
@@ -18,11 +18,13 @@ void test_qwen3_forward() {
 
     minisgl::Qwen3ForCausalLM model(cfg);
 
-    auto input_ids = minisgl::Tensor::create({4}, minisgl::DataType::Int32, minisgl::DeviceType::CPU);
+    auto input_ids =
+        minisgl::Tensor::create({4}, minisgl::DataType::Int32, minisgl::DeviceType::CPU);
     int32_t ids[4] = {10, 20, 30, 40};
     input_ids->copy_from(ids, sizeof(ids), minisgl::DeviceType::CPU);
 
-    auto positions = minisgl::Tensor::create({4}, minisgl::DataType::Int32, minisgl::DeviceType::CPU);
+    auto positions =
+        minisgl::Tensor::create({4}, minisgl::DataType::Int32, minisgl::DeviceType::CPU);
     int32_t pos[4] = {0, 1, 2, 3};
     positions->copy_from(pos, sizeof(pos), minisgl::DeviceType::CPU);
 
@@ -49,11 +51,13 @@ void test_qwen3_moe_forward() {
 
     minisgl::Qwen3MoEForCausalLM model(cfg);
 
-    auto input_ids = minisgl::Tensor::create({2}, minisgl::DataType::Int32, minisgl::DeviceType::CPU);
+    auto input_ids =
+        minisgl::Tensor::create({2}, minisgl::DataType::Int32, minisgl::DeviceType::CPU);
     int32_t ids[2] = {5, 15};
     input_ids->copy_from(ids, sizeof(ids), minisgl::DeviceType::CPU);
 
-    auto positions = minisgl::Tensor::create({2}, minisgl::DataType::Int32, minisgl::DeviceType::CPU);
+    auto positions =
+        minisgl::Tensor::create({2}, minisgl::DataType::Int32, minisgl::DeviceType::CPU);
     int32_t pos[2] = {0, 1};
     positions->copy_from(pos, sizeof(pos), minisgl::DeviceType::CPU);
 

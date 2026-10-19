@@ -1,9 +1,9 @@
 #ifndef MINISGL_MODEL_CONFIG_H
 #define MINISGL_MODEL_CONFIG_H
 
+#include <nlohmann/json.hpp>
 #include <string>
 #include <vector>
-#include <nlohmann/json.hpp>
 
 namespace minisgl {
 
@@ -36,9 +36,7 @@ struct ModelConfig {
     std::string model_type{"qwen2"};
     std::vector<std::string> architectures;
 
-    bool is_moe() const {
-        return num_experts > 0 || model_type.find("moe") != std::string::npos;
-    }
+    bool is_moe() const { return num_experts > 0 || model_type.find("moe") != std::string::npos; }
 
     static ModelConfig from_json(const nlohmann::json& j);
     static ModelConfig from_file(const std::string& path);

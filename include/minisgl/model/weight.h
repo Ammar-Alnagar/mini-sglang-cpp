@@ -3,9 +3,9 @@
 
 #include "minisgl/core/tensor.h"
 #include "minisgl/model/config.h"
+#include <memory>
 #include <string>
 #include <unordered_map>
-#include <memory>
 #include <vector>
 
 namespace minisgl {
@@ -20,16 +20,19 @@ struct TensorInfo {
 };
 
 class WeightLoader {
-public:
+  public:
     WeightLoader(std::string model_dir);
 
     void load_metadata();
-    std::shared_ptr<Tensor> load_tensor(const std::string& tensor_name, DeviceType device = DeviceType::CPU);
+    std::shared_ptr<Tensor> load_tensor(const std::string& tensor_name,
+                                        DeviceType device = DeviceType::CPU);
     bool has_tensor(const std::string& tensor_name) const;
 
-    const std::unordered_map<std::string, TensorInfo>& tensor_infos() const { return tensor_infos_; }
+    const std::unordered_map<std::string, TensorInfo>& tensor_infos() const {
+        return tensor_infos_;
+    }
 
-private:
+  private:
     std::string model_dir_;
     std::unordered_map<std::string, TensorInfo> tensor_infos_;
 

@@ -1,7 +1,7 @@
-#include <httplib.h>
-#include <nlohmann/json.hpp>
-#include <iostream>
 #include <chrono>
+#include <httplib.h>
+#include <iostream>
+#include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
@@ -19,8 +19,7 @@ int main(int argc, char** argv) {
     json req_body = {
         {"messages", json::array({{{"role", "user"}, {"content", "Benchmark prompt"}}})},
         {"max_tokens", 16},
-        {"stream", false}
-    };
+        {"stream", false}};
 
     auto res = cli.Post("/v1/chat/completions", req_body.dump(), "application/json");
 
@@ -30,7 +29,8 @@ int main(int argc, char** argv) {
     if (res && res->status == 200) {
         std::cout << "Request successful! Latency: " << elapsed_ms << " ms" << std::endl;
     } else {
-        std::cout << "Server not reachable or returned error (Ensure minisgl server is running)." << std::endl;
+        std::cout << "Server not reachable or returned error (Ensure minisgl server is running)."
+                  << std::endl;
     }
 
     return 0;

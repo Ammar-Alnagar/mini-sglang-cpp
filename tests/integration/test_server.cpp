@@ -1,11 +1,11 @@
-#include "minisgl/server/server.h"
 #include "minisgl/model/config.h"
 #include "minisgl/model/qwen3.h"
-#include <httplib.h>
-#include <nlohmann/json.hpp>
-#include <iostream>
-#include <thread>
+#include "minisgl/server/server.h"
 #include <cassert>
+#include <httplib.h>
+#include <iostream>
+#include <nlohmann/json.hpp>
+#include <thread>
 
 using json = nlohmann::json;
 
@@ -31,9 +31,7 @@ void test_server() {
     int port = 19199;
     auto server = std::make_shared<minisgl::HttpServer>("127.0.0.1", port, tokenizer, scheduler);
 
-    std::thread server_thread([server]() {
-        server->start();
-    });
+    std::thread server_thread([server]() { server->start(); });
 
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
@@ -44,11 +42,9 @@ void test_server() {
     json j_health = json::parse(res_health->body);
     assert(j_health["status"] == "ok");
 
-    json req_body = {
-        {"messages", json::array({{{"role", "user"}, {"content", "Hello"}}})},
-        {"max_tokens", 4},
-        {"stream", false}
-    };
+    json req_body = {{"messages", json::array({{{"role", "user"}, {"content", "Hello"}}})},
+                     {"max_tokens", 4},
+                     {"stream", false}};
 
     auto res_chat = cli.Post("/v1/chat/completions", req_body.dump(), "application/json");
     assert(res_chat && res_chat->status == 200);

@@ -1,9 +1,9 @@
 #include "minisgl/layer/layer.h"
 #include "minisgl/kernel/kernels.h"
+#include <algorithm>
 #include <cmath>
 #include <cstring>
 #include <stdexcept>
-#include <algorithm>
 
 namespace minisgl {
 
@@ -24,7 +24,8 @@ std::shared_ptr<Tensor> Embedding::forward(const std::shared_ptr<Tensor>& input_
         for (int64_t i = 0; i < batch_size; ++i) {
             int32_t id = ids[i];
             if (id >= 0 && id < num_embeddings_) {
-                std::memcpy(dst + i * embedding_dim_, w + id * embedding_dim_, embedding_dim_ * sizeof(float));
+                std::memcpy(dst + i * embedding_dim_, w + id * embedding_dim_,
+                            embedding_dim_ * sizeof(float));
             } else {
                 std::memset(dst + i * embedding_dim_, 0, embedding_dim_ * sizeof(float));
             }
@@ -32,7 +33,8 @@ std::shared_ptr<Tensor> Embedding::forward(const std::shared_ptr<Tensor>& input_
     } else if (input_ids->device() == DeviceType::CUDA) {
 #ifdef MINISGL_USE_CUDA
         cuda::launch_index_gather(weight->data_ptr<float>(), input_ids->data_ptr<int32_t>(),
-                                  out->data_ptr<float>(), embedding_dim_, static_cast<int>(batch_size));
+                                  out->data_ptr<float>(), embedding_dim_,
+                                  static_cast<int>(batch_size));
 #endif
     }
 
@@ -103,8 +105,8 @@ void RMSNorm::forward_fused_add(std::shared_ptr<Tensor>& x, std::shared_ptr<Tens
         }
     } else if (x->device() == DeviceType::CUDA) {
 #ifdef MINISGL_USE_CUDA
-        cuda::launch_rmsnorm(x->data_ptr<float>(), weight->data_ptr<float>(),
-                             x->data_ptr<float>(), static_cast<int>(num_tokens), size_, eps_);
+        cuda::launch_rmsnorm(x->data_ptr<float>(), weight->data_ptr<float>(), x->data_ptr<float>(),
+                             static_cast<int>(num_tokens), size_, eps_);
 #endif
     }
 }
@@ -140,7 +142,8 @@ std::shared_ptr<Tensor> Linear::forward(const std::shared_ptr<Tensor>& x) {
     return out;
 }
 
-std::shared_ptr<Tensor> SwiGLU::forward(const std::shared_ptr<Tensor>& gate, const std::shared_ptr<Tensor>& up) {
+std::shared_ptr<Tensor> SwiGLU::forward(const std::shared_ptr<Tensor>& gate,
+                                        const std::shared_ptr<Tensor>& up) {
     auto out = Tensor::create(gate->shape(), gate->dtype(), gate->device());
     int64_t n = gate->numel();
 
@@ -173,8 +176,7 @@ RotaryEmbedding::RotaryEmbedding(int head_dim, int max_position, float base)
 }
 
 void RotaryEmbedding::forward(const std::shared_ptr<Tensor>& positions,
-                             std::shared_ptr<Tensor>& query,
-                             std::shared_ptr<Tensor>& key) {
+                              std::shared_ptr<Tensor>& query, std::shared_ptr<Tensor>& key) {
     int64_t num_q = query->numel() / head_dim_;
     if (positions->device() == DeviceType::CPU) {
         const int32_t* pos_ptr = positions->data_ptr<int32_t>();
@@ -198,15 +200,16 @@ void RotaryEmbedding::forward(const std::shared_ptr<Tensor>& positions,
     } else if (positions->device() == DeviceType::CUDA) {
 #ifdef MINISGL_USE_CUDA
         cuda::launch_rope(query->data_ptr<float>(), key ? key->data_ptr<float>() : nullptr,
-                         positions->data_ptr<int32_t>(), cos_sin_cache_->data_ptr<float>(),
-                         static_cast<int>(num_q), 1, head_dim_);
+                          positions->data_ptr<int32_t>(), cos_sin_cache_->data_ptr<float>(),
+                          static_cast<int>(num_q), 1, head_dim_);
 #endif
     }
 }
 
 // Attention
 Attention::Attention(int num_heads, int head_dim)
-    : num_heads_(num_heads), head_dim_(head_dim), scale_(1.0f / std::sqrt(static_cast<float>(head_dim))) {}
+    : num_heads_(num_heads), head_dim_(head_dim),
+      scale_(1.0f / std::sqrt(static_cast<float>(head_dim))) {}
 
 std::shared_ptr<Tensor> Attention::forward(const std::shared_ptr<Tensor>& q,
                                            const std::shared_ptr<Tensor>& k,
@@ -233,7 +236,8 @@ std::shared_ptr<Tensor> Attention::forward(const std::shared_ptr<Tensor>& q,
                         dot += q_val * k_val;
                     }
                     scores[j] = dot * scale_;
-                    if (scores[j] > max_score) max_score = scores[j];
+                    if (scores[j] > max_score)
+                        max_score = scores[j];
                 }
 
                 float sum_exp = 0.0f;
@@ -263,7 +267,8 @@ MoERouter::MoERouter(int hidden_size, int num_experts, int top_k, bool norm_topk
     weight = Tensor::create({num_experts, hidden_size}, DataType::Float32, DeviceType::CPU);
 }
 
-std::shared_ptr<Tensor> MoERouter::route(const std::shared_ptr<Tensor>& x, std::shared_ptr<Tensor>& router_weights) {
+std::shared_ptr<Tensor> MoERouter::route(const std::shared_ptr<Tensor>& x,
+                                         std::shared_ptr<Tensor>& router_weights) {
     int64_t num_tokens = x->numel() / hidden_size_;
     auto selected_experts = Tensor::create({num_tokens, top_k_}, DataType::Int32, x->device());
     router_weights = Tensor::create({num_tokens, top_k_}, DataType::Float32, x->device());

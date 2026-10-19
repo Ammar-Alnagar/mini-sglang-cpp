@@ -1,9 +1,9 @@
 #include "minisgl/tokenizer/tokenizer.h"
+#include <algorithm>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <filesystem>
 #include <sstream>
-#include <algorithm>
 
 namespace minisgl {
 
@@ -17,7 +17,8 @@ Tokenizer::Tokenizer(const std::string& model_dir) {
 
 void Tokenizer::parse_tokenizer_config_json(const std::string& filepath) {
     std::ifstream f(filepath);
-    if (!f.is_open()) return;
+    if (!f.is_open())
+        return;
     try {
         nlohmann::json j;
         f >> j;
@@ -27,12 +28,14 @@ void Tokenizer::parse_tokenizer_config_json(const std::string& filepath) {
         if (j.contains("bos_token_id") && j["bos_token_id"].is_number_integer()) {
             bos_token_id_ = j["bos_token_id"].get<int32_t>();
         }
-    } catch (...) {}
+    } catch (...) {
+    }
 }
 
 void Tokenizer::parse_tokenizer_json(const std::string& filepath) {
     std::ifstream f(filepath);
-    if (!f.is_open()) return;
+    if (!f.is_open())
+        return;
     try {
         nlohmann::json j;
         f >> j;
@@ -54,7 +57,8 @@ void Tokenizer::parse_tokenizer_json(const std::string& filepath) {
                 }
             }
         }
-    } catch (...) {}
+    } catch (...) {
+    }
 }
 
 bool Tokenizer::load(const std::string& model_dir) {

@@ -4,7 +4,8 @@
 
 namespace minisgl {
 
-InteractiveShell::InteractiveShell(std::shared_ptr<Tokenizer> tokenizer, std::shared_ptr<Scheduler> scheduler)
+InteractiveShell::InteractiveShell(std::shared_ptr<Tokenizer> tokenizer,
+                                   std::shared_ptr<Scheduler> scheduler)
     : tokenizer_(std::move(tokenizer)), scheduler_(std::move(scheduler)) {}
 
 void InteractiveShell::run() {
@@ -14,7 +15,8 @@ void InteractiveShell::run() {
     std::string line;
     while (true) {
         std::cout << "\nUser: ";
-        if (!std::getline(std::cin, line)) break;
+        if (!std::getline(std::cin, line))
+            break;
 
         if (line == "/reset") {
             history_.clear();
@@ -22,7 +24,8 @@ void InteractiveShell::run() {
             continue;
         }
 
-        if (line.empty()) continue;
+        if (line.empty())
+            continue;
 
         history_.push_back({"user", line});
         std::string prompt = tokenizer_->apply_chat_template(history_);
@@ -41,7 +44,8 @@ void InteractiveShell::run() {
             scheduler_->step();
             if (req->input_ids.size() > input_tokens.size()) {
                 int32_t last_tok = req->input_ids.back();
-                std::string chunk = tokenizer_->detokenize_incremental(req->uid, last_tok, req->finished);
+                std::string chunk =
+                    tokenizer_->detokenize_incremental(req->uid, last_tok, req->finished);
                 std::cout << chunk << std::flush;
                 assistant_reply += chunk;
             }

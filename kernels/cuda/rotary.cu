@@ -3,18 +3,16 @@
 namespace minisgl {
 namespace cuda {
 
-__global__ void apply_rope_kernel(float* __restrict__ query,
-                                  float* __restrict__ key,
+__global__ void apply_rope_kernel(float* __restrict__ query, float* __restrict__ key,
                                   const int* __restrict__ positions,
-                                  const float* __restrict__ cos_sin_cache,
-                                  int num_tokens,
-                                  int num_heads,
-                                  int head_dim) {
+                                  const float* __restrict__ cos_sin_cache, int num_tokens,
+                                  int num_heads, int head_dim) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     int half_dim = head_dim / 2;
     int total_elements = num_tokens * num_heads * half_dim;
 
-    if (idx >= total_elements) return;
+    if (idx >= total_elements)
+        return;
 
     int h = (idx / half_dim) % num_heads;
     int token_idx = idx / (num_heads * half_dim);
@@ -48,7 +46,8 @@ void launch_rope(float* query, float* key, const int* positions, const float* co
     int total = num_tokens * num_heads * half_dim;
     int threads = 256;
     int blocks = (total + threads - 1) / threads;
-    apply_rope_kernel<<<blocks, threads, 0, stream>>>(query, key, positions, cos_sin_cache, num_tokens, num_heads, head_dim);
+    apply_rope_kernel<<<blocks, threads, 0, stream>>>(query, key, positions, cos_sin_cache,
+                                                      num_tokens, num_heads, head_dim);
 }
 
 } // namespace cuda

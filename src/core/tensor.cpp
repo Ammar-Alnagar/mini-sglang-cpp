@@ -11,17 +11,25 @@ namespace minisgl {
 
 size_t get_dtype_size(DataType dtype) {
     switch (dtype) {
-        case DataType::Float32: return 4;
-        case DataType::Float16: return 2;
-        case DataType::BFloat16: return 2;
-        case DataType::Int32: return 4;
-        case DataType::Int64: return 8;
-        case DataType::Int8: return 1;
-        default: return 4;
+        case DataType::Float32:
+            return 4;
+        case DataType::Float16:
+            return 2;
+        case DataType::BFloat16:
+            return 2;
+        case DataType::Int32:
+            return 4;
+        case DataType::Int64:
+            return 8;
+        case DataType::Int8:
+            return 1;
+        default:
+            return 4;
     }
 }
 
-Tensor::Tensor() : dtype_(DataType::Float32), device_(DeviceType::CPU), data_(nullptr), owns_data_(false) {}
+Tensor::Tensor()
+    : dtype_(DataType::Float32), device_(DeviceType::CPU), data_(nullptr), owns_data_(false) {}
 
 Tensor::Tensor(std::vector<int64_t> shape, DataType dtype, DeviceType device)
     : shape_(std::move(shape)), dtype_(dtype), device_(device) {
@@ -33,11 +41,8 @@ Tensor::~Tensor() {
 }
 
 Tensor::Tensor(Tensor&& other) noexcept
-    : shape_(std::move(other.shape_)),
-      dtype_(other.dtype_),
-      device_(other.device_),
-      data_(other.data_),
-      owns_data_(other.owns_data_) {
+    : shape_(std::move(other.shape_)), dtype_(other.dtype_), device_(other.device_),
+      data_(other.data_), owns_data_(other.owns_data_) {
     other.data_ = nullptr;
     other.owns_data_ = false;
 }
@@ -56,12 +61,14 @@ Tensor& Tensor::operator=(Tensor&& other) noexcept {
     return *this;
 }
 
-std::shared_ptr<Tensor> Tensor::create(std::vector<int64_t> shape, DataType dtype, DeviceType device) {
+std::shared_ptr<Tensor> Tensor::create(std::vector<int64_t> shape, DataType dtype,
+                                       DeviceType device) {
     return std::make_shared<Tensor>(std::move(shape), dtype, device);
 }
 
 int64_t Tensor::numel() const {
-    if (shape_.empty()) return 0;
+    if (shape_.empty())
+        return 0;
     int64_t count = 1;
     for (auto dim : shape_) {
         count *= dim;
@@ -116,15 +123,19 @@ void Tensor::free() {
 }
 
 void Tensor::copy_from(const void* src, size_t size_bytes, DeviceType src_device) {
-    if (!data_) return;
+    if (!data_)
+        return;
     if (device_ == DeviceType::CPU && src_device == DeviceType::CPU) {
         std::memcpy(data_, src, size_bytes);
     } else {
 #ifdef MINISGL_USE_CUDA
         cudaMemcpyKind kind = cudaMemcpyHostToDevice;
-        if (src_device == DeviceType::CPU && device_ == DeviceType::CUDA) kind = cudaMemcpyHostToDevice;
-        else if (src_device == DeviceType::CUDA && device_ == DeviceType::CPU) kind = cudaMemcpyDeviceToHost;
-        else if (src_device == DeviceType::CUDA && device_ == DeviceType::CUDA) kind = cudaMemcpyDeviceToDevice;
+        if (src_device == DeviceType::CPU && device_ == DeviceType::CUDA)
+            kind = cudaMemcpyHostToDevice;
+        else if (src_device == DeviceType::CUDA && device_ == DeviceType::CPU)
+            kind = cudaMemcpyDeviceToHost;
+        else if (src_device == DeviceType::CUDA && device_ == DeviceType::CUDA)
+            kind = cudaMemcpyDeviceToDevice;
         cudaMemcpy(data_, src, size_bytes, kind);
 #else
         throw std::runtime_error("CUDA copy not supported in CPU mode");
@@ -133,15 +144,19 @@ void Tensor::copy_from(const void* src, size_t size_bytes, DeviceType src_device
 }
 
 void Tensor::copy_to(void* dst, size_t size_bytes, DeviceType dst_device) const {
-    if (!data_) return;
+    if (!data_)
+        return;
     if (device_ == DeviceType::CPU && dst_device == DeviceType::CPU) {
         std::memcpy(dst, data_, size_bytes);
     } else {
 #ifdef MINISGL_USE_CUDA
         cudaMemcpyKind kind = cudaMemcpyDeviceToHost;
-        if (device_ == DeviceType::CUDA && dst_device == DeviceType::CPU) kind = cudaMemcpyDeviceToHost;
-        else if (device_ == DeviceType::CPU && dst_device == DeviceType::CUDA) kind = cudaMemcpyHostToDevice;
-        else if (device_ == DeviceType::CUDA && dst_device == DeviceType::CUDA) kind = cudaMemcpyDeviceToDevice;
+        if (device_ == DeviceType::CUDA && dst_device == DeviceType::CPU)
+            kind = cudaMemcpyDeviceToHost;
+        else if (device_ == DeviceType::CPU && dst_device == DeviceType::CUDA)
+            kind = cudaMemcpyHostToDevice;
+        else if (device_ == DeviceType::CUDA && dst_device == DeviceType::CUDA)
+            kind = cudaMemcpyDeviceToDevice;
         cudaMemcpy(dst, data_, size_bytes, kind);
 #else
         throw std::runtime_error("CUDA copy not supported in CPU mode");

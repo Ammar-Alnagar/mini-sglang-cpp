@@ -1,6 +1,6 @@
 #include "minisgl/distributed/tp.h"
-#include <iostream>
 #include <cassert>
+#include <iostream>
 
 void test_tp_communicator() {
     std::cout << "Testing TPCommunicator..." << std::endl;

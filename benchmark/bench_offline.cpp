@@ -1,8 +1,8 @@
 #include "minisgl/model/config.h"
 #include "minisgl/model/qwen3.h"
 #include "minisgl/scheduler/scheduler.h"
-#include <iostream>
 #include <chrono>
+#include <iostream>
 
 int main(int argc, char** argv) {
     std::cout << "Mini-SGLang Offline Benchmark" << std::endl;

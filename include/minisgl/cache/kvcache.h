@@ -3,16 +3,17 @@
 
 #include "minisgl/core/tensor.h"
 #include "minisgl/core/types.h"
-#include <vector>
+#include <map>
 #include <memory>
 #include <unordered_map>
-#include <map>
+#include <vector>
 
 namespace minisgl {
 
 class KVCachePool {
-public:
-    KVCachePool(int num_pages, int page_size, int num_heads, int head_dim, DeviceType device = DeviceType::CPU);
+  public:
+    KVCachePool(int num_pages, int page_size, int num_heads, int head_dim,
+                DeviceType device = DeviceType::CPU);
 
     int allocate_page();
     void free_page(int page_idx);
@@ -23,7 +24,7 @@ public:
     std::shared_ptr<Tensor> k_cache;
     std::shared_ptr<Tensor> v_cache;
 
-private:
+  private:
     int num_pages_;
     int page_size_;
     int num_heads_;
@@ -45,7 +46,7 @@ struct RadixNode {
 };
 
 class RadixCache {
-public:
+  public:
     explicit RadixCache(std::shared_ptr<KVCachePool> pool);
 
     struct MatchResult {
@@ -55,10 +56,11 @@ public:
     };
 
     MatchResult match_prefix(const std::vector<int32_t>& input_tokens);
-    void insert_prefix(const std::vector<int32_t>& input_tokens, const std::vector<int>& page_indices);
+    void insert_prefix(const std::vector<int32_t>& input_tokens,
+                       const std::vector<int>& page_indices);
     void evict(int needed_pages);
 
-private:
+  private:
     std::shared_ptr<KVCachePool> pool_;
     std::shared_ptr<RadixNode> root_;
     int node_counter_{0};
@@ -66,13 +68,13 @@ private:
 };
 
 class NaiveCache {
-public:
+  public:
     explicit NaiveCache(std::shared_ptr<KVCachePool> pool);
 
     std::vector<int> allocate(int num_tokens);
     void free(const std::vector<int>& page_indices);
 
-private:
+  private:
     std::shared_ptr<KVCachePool> pool_;
 };
 

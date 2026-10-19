@@ -1,21 +1,27 @@
 #include "minisgl/model/weight.h"
+#include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <filesystem>
-#include <stdexcept>
 #include <nlohmann/json.hpp>
+#include <stdexcept>
 
 namespace minisgl {
 
 namespace fs = std::filesystem;
 
 static DataType string_to_dtype(const std::string& str) {
-    if (str == "F32") return DataType::Float32;
-    if (str == "F16") return DataType::Float16;
-    if (str == "BF16") return DataType::BFloat16;
-    if (str == "I32") return DataType::Int32;
-    if (str == "I64") return DataType::Int64;
-    if (str == "I8") return DataType::Int8;
+    if (str == "F32")
+        return DataType::Float32;
+    if (str == "F16")
+        return DataType::Float16;
+    if (str == "BF16")
+        return DataType::BFloat16;
+    if (str == "I32")
+        return DataType::Int32;
+    if (str == "I64")
+        return DataType::Int64;
+    if (str == "I8")
+        return DataType::Int8;
     return DataType::Float32;
 }
 
@@ -25,7 +31,8 @@ WeightLoader::WeightLoader(std::string model_dir) : model_dir_(std::move(model_d
 
 void WeightLoader::load_safetensors_file(const std::string& filepath) {
     std::ifstream file(filepath, std::ios::binary);
-    if (!file.is_open()) return;
+    if (!file.is_open())
+        return;
 
     uint64_t header_size = 0;
     file.read(reinterpret_cast<char*>(&header_size), sizeof(header_size));
@@ -38,7 +45,8 @@ void WeightLoader::load_safetensors_file(const std::string& filepath) {
     size_t buffer_base_offset = 8 + header_size;
 
     for (auto& [key, value] : header.items()) {
-        if (key == "__metadata__") continue;
+        if (key == "__metadata__")
+            continue;
 
         TensorInfo info;
         info.name = key;
@@ -56,7 +64,8 @@ void WeightLoader::load_safetensors_file(const std::string& filepath) {
 
 void WeightLoader::load_metadata() {
     tensor_infos_.clear();
-    if (!fs::exists(model_dir_)) return;
+    if (!fs::exists(model_dir_))
+        return;
 
     for (const auto& entry : fs::directory_iterator(model_dir_)) {
         if (entry.path().extension() == ".safetensors") {
@@ -69,7 +78,8 @@ bool WeightLoader::has_tensor(const std::string& tensor_name) const {
     return tensor_infos_.find(tensor_name) != tensor_infos_.end();
 }
 
-std::shared_ptr<Tensor> WeightLoader::load_tensor(const std::string& tensor_name, DeviceType device) {
+std::shared_ptr<Tensor> WeightLoader::load_tensor(const std::string& tensor_name,
+                                                  DeviceType device) {
     auto it = tensor_infos_.find(tensor_name);
     if (it == tensor_infos_.end()) {
         throw std::runtime_error("Tensor not found in weights: " + tensor_name);

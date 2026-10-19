@@ -10,13 +10,14 @@
 namespace minisgl {
 
 class HttpServer {
-public:
-    HttpServer(std::string host, int port, std::shared_ptr<Tokenizer> tokenizer, std::shared_ptr<Scheduler> scheduler);
+  public:
+    HttpServer(std::string host, int port, std::shared_ptr<Tokenizer> tokenizer,
+               std::shared_ptr<Scheduler> scheduler);
 
     void start();
     void stop();
 
-private:
+  private:
     std::string host_;
     int port_;
     std::shared_ptr<Tokenizer> tokenizer_;

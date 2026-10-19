@@ -11,11 +11,13 @@ TPCommunicator::TPCommunicator(int rank, int world_size) : rank_(rank), world_si
 TPCommunicator::~TPCommunicator() {}
 
 void TPCommunicator::init() {
-    if (world_size_ <= 1) return;
+    if (world_size_ <= 1)
+        return;
 }
 
 std::shared_ptr<Tensor> TPCommunicator::all_reduce_sum(const std::shared_ptr<Tensor>& input) {
-    if (world_size_ <= 1) return input;
+    if (world_size_ <= 1)
+        return input;
 
     auto out = Tensor::create(input->shape(), input->dtype(), input->device());
 
@@ -27,7 +29,8 @@ std::shared_ptr<Tensor> TPCommunicator::all_reduce_sum(const std::shared_ptr<Ten
 }
 
 std::shared_ptr<Tensor> TPCommunicator::all_gather(const std::shared_ptr<Tensor>& input) {
-    if (world_size_ <= 1) return input;
+    if (world_size_ <= 1)
+        return input;
 
     auto shape = input->shape();
     shape[0] *= world_size_;

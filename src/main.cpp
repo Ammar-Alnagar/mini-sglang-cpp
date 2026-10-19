@@ -1,14 +1,14 @@
-#include "minisgl/server/args.h"
-#include "minisgl/server/server.h"
-#include "minisgl/server/shell.h"
-#include "minisgl/tokenizer/tokenizer.h"
 #include "minisgl/model/config.h"
 #include "minisgl/model/qwen3.h"
 #include "minisgl/model/qwen3_moe.h"
 #include "minisgl/model/weight.h"
 #include "minisgl/scheduler/scheduler.h"
-#include <iostream>
+#include "minisgl/server/args.h"
+#include "minisgl/server/server.h"
+#include "minisgl/server/shell.h"
+#include "minisgl/tokenizer/tokenizer.h"
 #include <filesystem>
+#include <iostream>
 
 namespace fs = std::filesystem;
 
@@ -28,7 +28,8 @@ int main(int argc, char** argv) {
     if (fs::exists(config_path)) {
         config = minisgl::ModelConfig::from_file(config_path);
     } else {
-        std::cout << "Config file not found at " << config_path << ", using default configuration." << std::endl;
+        std::cout << "Config file not found at " << config_path << ", using default configuration."
+                  << std::endl;
         config.num_layers = 4;
         config.hidden_size = 256;
         config.num_qo_heads = 8;

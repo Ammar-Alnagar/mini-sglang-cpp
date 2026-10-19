@@ -1,11 +1,11 @@
 #ifndef MINISGL_TOKENIZER_TOKENIZER_H
 #define MINISGL_TOKENIZER_TOKENIZER_H
 
-#include <string>
-#include <vector>
-#include <unordered_map>
 #include <memory>
 #include <nlohmann/json.hpp>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 namespace minisgl {
 
@@ -23,7 +23,7 @@ struct DecodeStatus {
 };
 
 class Tokenizer {
-public:
+  public:
     Tokenizer();
     explicit Tokenizer(const std::string& model_dir);
 
@@ -42,7 +42,7 @@ public:
     int32_t pad_token_id() const { return pad_token_id_; }
     int vocab_size() const { return static_cast<int>(token_to_id_.size()); }
 
-private:
+  private:
     std::unordered_map<std::string, int32_t> token_to_id_;
     std::unordered_map<int32_t, std::string> id_to_token_;
     std::unordered_map<int, DecodeStatus> decode_map_;

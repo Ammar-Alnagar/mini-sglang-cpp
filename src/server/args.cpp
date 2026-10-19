@@ -1,6 +1,6 @@
 #include "minisgl/server/args.h"
-#include <iostream>
 #include <cstring>
+#include <iostream>
 
 namespace minisgl {
 

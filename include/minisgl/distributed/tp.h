@@ -7,7 +7,7 @@
 namespace minisgl {
 
 class TPCommunicator {
-public:
+  public:
     TPCommunicator(int rank = 0, int world_size = 1);
     ~TPCommunicator();
 
@@ -18,7 +18,7 @@ public:
     int rank() const { return rank_; }
     int world_size() const { return world_size_; }
 
-private:
+  private:
     int rank_{0};
     int world_size_{1};
     void* nccl_comm_{nullptr};

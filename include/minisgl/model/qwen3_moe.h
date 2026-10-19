@@ -11,11 +11,10 @@
 namespace minisgl {
 
 class Qwen3MoEDecoderLayer {
-public:
+  public:
     Qwen3MoEDecoderLayer(const ModelConfig& config, int layer_id);
 
-    std::shared_ptr<Tensor> forward(std::shared_ptr<Tensor>& x,
-                                    std::shared_ptr<Tensor>& residual,
+    std::shared_ptr<Tensor> forward(std::shared_ptr<Tensor>& x, std::shared_ptr<Tensor>& residual,
                                     const std::shared_ptr<Tensor>& positions);
 
     RMSNorm input_layernorm;
@@ -28,13 +27,13 @@ public:
     RotaryEmbedding rotary_emb;
     SwiGLU swiglu;
 
-private:
+  private:
     int layer_id_;
     ModelConfig config_;
 };
 
 class Qwen3MoEForCausalLM {
-public:
+  public:
     explicit Qwen3MoEForCausalLM(const ModelConfig& config);
 
     void load_weights(WeightLoader& loader);
@@ -47,7 +46,7 @@ public:
     RMSNorm norm;
     Linear lm_head;
 
-private:
+  private:
     ModelConfig config_;
 };
 

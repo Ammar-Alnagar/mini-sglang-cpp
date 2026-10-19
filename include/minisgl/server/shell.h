@@ -8,12 +8,12 @@
 namespace minisgl {
 
 class InteractiveShell {
-public:
+  public:
     InteractiveShell(std::shared_ptr<Tokenizer> tokenizer, std::shared_ptr<Scheduler> scheduler);
 
     void run();
 
-private:
+  private:
     std::shared_ptr<Tokenizer> tokenizer_;
     std::shared_ptr<Scheduler> scheduler_;
     std::vector<ChatMessage> history_;

@@ -2,8 +2,8 @@
 #include "minisgl/core/types.h"
 #include "minisgl/model/config.h"
 #include "minisgl/tokenizer/tokenizer.h"
-#include <iostream>
 #include <cassert>
+#include <iostream>
 
 void test_tensor() {
     std::cout << "Testing Tensor..." << std::endl;
@@ -24,17 +24,15 @@ void test_tensor() {
 
 void test_config() {
     std::cout << "Testing ModelConfig..." << std::endl;
-    nlohmann::json j = {
-        {"architectures", {"Qwen2ForCausalLM"}},
-        {"hidden_size", 1024},
-        {"num_attention_heads", 16},
-        {"num_key_value_heads", 4},
-        {"num_hidden_layers", 12},
-        {"vocab_size", 151936},
-        {"intermediate_size", 2816},
-        {"rms_norm_eps", 1e-6},
-        {"model_type", "qwen2"}
-    };
+    nlohmann::json j = {{"architectures", {"Qwen2ForCausalLM"}},
+                        {"hidden_size", 1024},
+                        {"num_attention_heads", 16},
+                        {"num_key_value_heads", 4},
+                        {"num_hidden_layers", 12},
+                        {"vocab_size", 151936},
+                        {"intermediate_size", 2816},
+                        {"rms_norm_eps", 1e-6},
+                        {"model_type", "qwen2"}};
     auto cfg = minisgl::ModelConfig::from_json(j);
     assert(cfg.hidden_size == 1024);
     assert(cfg.num_qo_heads == 16);

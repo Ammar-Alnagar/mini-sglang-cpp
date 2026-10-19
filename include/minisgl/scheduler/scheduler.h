@@ -1,16 +1,16 @@
 #ifndef MINISGL_SCHEDULER_SCHEDULER_H
 #define MINISGL_SCHEDULER_SCHEDULER_H
 
-#include "minisgl/core/types.h"
 #include "minisgl/cache/kvcache.h"
+#include "minisgl/core/types.h"
 #include "minisgl/model/qwen3.h"
 #include "minisgl/model/qwen3_moe.h"
-#include <queue>
-#include <vector>
+#include <atomic>
 #include <memory>
 #include <mutex>
+#include <queue>
 #include <thread>
-#include <atomic>
+#include <vector>
 
 namespace minisgl {
 
@@ -24,7 +24,7 @@ struct SchedulerConfig {
 };
 
 class Scheduler {
-public:
+  public:
     Scheduler(SchedulerConfig config, std::shared_ptr<Qwen3ForCausalLM> model);
 
     void add_request(std::shared_ptr<Req> req);
@@ -38,7 +38,7 @@ public:
 
     const std::vector<std::shared_ptr<Req>>& finished_reqs() const { return finished_reqs_; }
 
-private:
+  private:
     SchedulerConfig config_;
     std::shared_ptr<Qwen3ForCausalLM> model_;
     std::shared_ptr<KVCachePool> pool_;

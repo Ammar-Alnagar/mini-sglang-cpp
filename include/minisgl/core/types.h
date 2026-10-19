@@ -2,10 +2,10 @@
 #define MINISGL_CORE_TYPES_H
 
 #include "minisgl/core/tensor.h"
-#include <vector>
-#include <string>
-#include <memory>
 #include <cstdint>
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace minisgl {
 
@@ -16,15 +16,10 @@ struct SamplingParams {
     bool ignore_eos{false};
     int max_tokens{1024};
 
-    bool is_greedy() const {
-        return (temperature <= 0.0f || top_k == 1) && top_p == 1.0f;
-    }
+    bool is_greedy() const { return (temperature <= 0.0f || top_k == 1) && top_p == 1.0f; }
 };
 
-enum class ReqPhase {
-    PREFILL,
-    DECODE
-};
+enum class ReqPhase { PREFILL, DECODE };
 
 struct CacheHandle {
     int page_table_idx{-1};
@@ -32,7 +27,7 @@ struct CacheHandle {
 };
 
 class Req {
-public:
+  public:
     int uid;
     int table_idx;
     int cached_len;
@@ -44,13 +39,10 @@ public:
     CacheHandle cache_handle;
     bool finished{false};
 
-    Req(int uid, std::vector<int32_t> input_tokens, int table_idx, int cached_len, int output_len, SamplingParams params)
-        : uid(uid),
-          table_idx(table_idx),
-          cached_len(cached_len),
-          output_len(output_len),
-          input_ids(std::move(input_tokens)),
-          sampling_params(params) {
+    Req(int uid, std::vector<int32_t> input_tokens, int table_idx, int cached_len, int output_len,
+        SamplingParams params)
+        : uid(uid), table_idx(table_idx), cached_len(cached_len), output_len(output_len),
+          input_ids(std::move(input_tokens)), sampling_params(params) {
         device_len = static_cast<int>(input_ids.size());
         max_device_len = device_len + output_len;
     }
@@ -64,9 +56,7 @@ public:
         device_len += 1;
     }
 
-    void append_token(int32_t token) {
-        input_ids.push_back(token);
-    }
+    void append_token(int32_t token) { input_ids.push_back(token); }
 };
 
 struct Batch {

@@ -1,32 +1,22 @@
 #ifndef MINISGL_CORE_TENSOR_H
 #define MINISGL_CORE_TENSOR_H
 
-#include <vector>
-#include <string>
-#include <memory>
 #include <cstdint>
 #include <iostream>
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace minisgl {
 
-enum class DataType {
-    Float32,
-    Float16,
-    BFloat16,
-    Int32,
-    Int64,
-    Int8
-};
+enum class DataType { Float32, Float16, BFloat16, Int32, Int64, Int8 };
 
-enum class DeviceType {
-    CPU,
-    CUDA
-};
+enum class DeviceType { CPU, CUDA };
 
 size_t get_dtype_size(DataType dtype);
 
 class Tensor {
-public:
+  public:
     Tensor();
     Tensor(std::vector<int64_t> shape, DataType dtype, DeviceType device = DeviceType::CPU);
     ~Tensor();
@@ -37,7 +27,8 @@ public:
     Tensor(const Tensor&) = delete;
     Tensor& operator=(const Tensor&) = delete;
 
-    static std::shared_ptr<Tensor> create(std::vector<int64_t> shape, DataType dtype, DeviceType device = DeviceType::CPU);
+    static std::shared_ptr<Tensor> create(std::vector<int64_t> shape, DataType dtype,
+                                          DeviceType device = DeviceType::CPU);
 
     const std::vector<int64_t>& shape() const { return shape_; }
     DataType dtype() const { return dtype_; }
@@ -45,11 +36,15 @@ public:
     void* data() { return data_; }
     const void* data() const { return data_; }
 
-    template<typename T>
-    T* data_ptr() { return static_cast<T*>(data_); }
+    template <typename T>
+    T* data_ptr() {
+        return static_cast<T*>(data_);
+    }
 
-    template<typename T>
-    const T* data_ptr() const { return static_cast<const T*>(data_); }
+    template <typename T>
+    const T* data_ptr() const {
+        return static_cast<const T*>(data_);
+    }
 
     int64_t numel() const;
     size_t size_in_bytes() const;
@@ -61,7 +56,7 @@ public:
 
     std::shared_ptr<Tensor> to(DeviceType new_device) const;
 
-private:
+  private:
     std::vector<int64_t> shape_;
     DataType dtype_;
     DeviceType device_;

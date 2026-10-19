@@ -1,12 +1,13 @@
 #include "minisgl/scheduler/scheduler.h"
-#include <iostream>
 #include <algorithm>
+#include <iostream>
 
 namespace minisgl {
 
 Scheduler::Scheduler(SchedulerConfig config, std::shared_ptr<Qwen3ForCausalLM> model)
     : config_(config), model_(std::move(model)) {
-    pool_ = std::make_shared<KVCachePool>(config.max_pages, config.page_size, 8, 128, DeviceType::CPU);
+    pool_ =
+        std::make_shared<KVCachePool>(config.max_pages, config.page_size, 8, 128, DeviceType::CPU);
     radix_cache_ = std::make_shared<RadixCache>(pool_);
     naive_cache_ = std::make_shared<NaiveCache>(pool_);
 }
@@ -31,9 +32,11 @@ std::shared_ptr<Batch> Scheduler::schedule_next_batch() {
         batch->phase = ReqPhase::PREFILL;
         int prefill_tokens = 0;
 
-        while (!waiting_queue_.empty() && batch->reqs.size() < static_cast<size_t>(config_.max_batch_size)) {
+        while (!waiting_queue_.empty() &&
+               batch->reqs.size() < static_cast<size_t>(config_.max_batch_size)) {
             auto req = waiting_queue_.front();
-            if (prefill_tokens + req->device_len > config_.max_prefill_len && !batch->reqs.empty()) {
+            if (prefill_tokens + req->device_len > config_.max_prefill_len &&
+                !batch->reqs.empty()) {
                 break;
             }
 
@@ -47,7 +50,8 @@ std::shared_ptr<Batch> Scheduler::schedule_next_batch() {
 
             int needed_pages = req->extend_len();
             auto pages = naive_cache_->allocate(needed_pages);
-            req->cache_handle.page_indices.insert(req->cache_handle.page_indices.end(), pages.begin(), pages.end());
+            req->cache_handle.page_indices.insert(req->cache_handle.page_indices.end(),
+                                                  pages.begin(), pages.end());
 
             prefill_tokens += req->extend_len();
             batch->reqs.push_back(req);
@@ -73,7 +77,8 @@ std::shared_ptr<Batch> Scheduler::schedule_next_batch() {
 
 void Scheduler::step() {
     auto batch = schedule_next_batch();
-    if (!batch || batch->reqs.empty()) return;
+    if (!batch || batch->reqs.empty())
+        return;
 
     std::vector<int32_t> batch_input_ids;
     std::vector<int32_t> batch_positions;
@@ -90,11 +95,15 @@ void Scheduler::step() {
         }
     }
 
-    auto in_ids_tensor = Tensor::create({static_cast<int64_t>(batch_input_ids.size())}, DataType::Int32, DeviceType::CPU);
-    in_ids_tensor->copy_from(batch_input_ids.data(), batch_input_ids.size() * sizeof(int32_t), DeviceType::CPU);
+    auto in_ids_tensor = Tensor::create({static_cast<int64_t>(batch_input_ids.size())},
+                                        DataType::Int32, DeviceType::CPU);
+    in_ids_tensor->copy_from(batch_input_ids.data(), batch_input_ids.size() * sizeof(int32_t),
+                             DeviceType::CPU);
 
-    auto pos_tensor = Tensor::create({static_cast<int64_t>(batch_positions.size())}, DataType::Int32, DeviceType::CPU);
-    pos_tensor->copy_from(batch_positions.data(), batch_positions.size() * sizeof(int32_t), DeviceType::CPU);
+    auto pos_tensor = Tensor::create({static_cast<int64_t>(batch_positions.size())},
+                                     DataType::Int32, DeviceType::CPU);
+    pos_tensor->copy_from(batch_positions.data(), batch_positions.size() * sizeof(int32_t),
+                          DeviceType::CPU);
 
     auto logits = model_->forward(in_ids_tensor, pos_tensor);
 
@@ -125,10 +134,9 @@ void Scheduler::step() {
         }
     }
 
-    running_reqs_.erase(
-        std::remove_if(running_reqs_.begin(), running_reqs_.end(), [](const auto& r) { return r->finished; }),
-        running_reqs_.end()
-    );
+    running_reqs_.erase(std::remove_if(running_reqs_.begin(), running_reqs_.end(),
+                                       [](const auto& r) { return r->finished; }),
+                        running_reqs_.end());
 }
 
 void Scheduler::run_loop() {

@@ -1,8 +1,8 @@
 #include "minisgl/cache/kvcache.h"
-#include "minisgl/scheduler/scheduler.h"
 #include "minisgl/model/qwen3.h"
-#include <iostream>
+#include "minisgl/scheduler/scheduler.h"
 #include <cassert>
+#include <iostream>
 
 void test_kv_pool() {
     std::cout << "Testing KVCachePool..." << std::endl;
